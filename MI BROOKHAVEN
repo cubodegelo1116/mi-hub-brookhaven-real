@@ -461,7 +461,8 @@ TabPlayers:AddToggle({
             local hum = char:FindFirstChildOfClass("Humanoid")
             local originalPos = root.Position
 
-            local tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+            -- ✅ Pegando o Couch automaticamente, por nome
+            local tool = LocalPlayer.Backpack:FindFirstChild("Couch") or LocalPlayer.Character:FindFirstChild("Couch")
             if tool then tool.Parent = char end
 
             hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
