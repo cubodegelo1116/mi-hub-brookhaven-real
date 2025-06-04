@@ -851,3 +851,19 @@ TabPlayers:AddButton({
 loadstring(game:HttpGet("https://pastebin.com/raw/2PEwAWga"))
     end
 })
+
+local TabScripts = Window:MakeTab({ "scripts", "rbxassetid://10723415903" })
+
+TabScripts:AddButton({
+    Name = "iy",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end
+})
+
+TabScripts:AddButton({
+    Name = "gumball hub",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/JaozinScripts/Gumball-Hub/refs/heads/main/GumballHubRetorn2.1.1.1.lua"))()
+    end
+})
