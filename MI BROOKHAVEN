@@ -1,4 +1,5 @@
 local remote = game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForChild("1RPNam1eTex1t")
+local selectedPlayer = nil 
 
 local mensagens = {
 	"EXECUTADO",
@@ -82,14 +83,11 @@ for _, p in pairs(Players:GetPlayers()) do
     end
 end
 
-local selectedPlayer = nil
-
 -- Criar o Dropdown
 local PlayerDropdown = TabPlayers:AddDropdown({
     Name = "Selecionar Player",
     Options = #currentPlayers > 0 and currentPlayers or {"Nenhum jogador"},
     Callback = function(Value)
-        -- Proteção: evita erro se Callback receber nil ou "Nenhum jogador"
         if Value and Value ~= "Nenhum jogador" then
             selectedPlayer = Value
         else
@@ -98,9 +96,8 @@ local PlayerDropdown = TabPlayers:AddDropdown({
     end
 })
 
--- Função segura para atualizar lista de players
+-- Função para atualizar lista de players
 local function AtualizarListaPlayers()
-    -- Atualiza lista atual
     currentPlayers = {}
     for _, plr in ipairs(Players:GetPlayers()) do
         if plr ~= LocalPlayer then
@@ -108,20 +105,16 @@ local function AtualizarListaPlayers()
         end
     end
 
-    -- Se não tiver nenhum, coloca "Nenhum jogador" pra evitar erros
     local novaLista = #currentPlayers > 0 and currentPlayers or {"Nenhum jogador"}
 
-    -- Proteção: remove seleção se não existir mais
     if not table.find(currentPlayers, selectedPlayer) then
         selectedPlayer = nil
     end
 
-    -- Atualiza as opções de forma segura
-    -- Alguns frameworks podem disparar automaticamente Callback, então estamos protegidos
     PlayerDropdown:SetOptions(novaLista)
 end
 
--- Conectar eventos do jogo
+-- Conectar eventos do jogo para atualizar automaticamente
 Players.PlayerAdded:Connect(function(p)
     if p ~= LocalPlayer then
         AtualizarListaPlayers()
@@ -132,7 +125,7 @@ Players.PlayerRemoving:Connect(function(p)
     AtualizarListaPlayers()
 end)
 
--- Botão de atualização manual
+-- Botão só chama a função
 TabPlayers:AddButton({
     Name = "Atualizar Jogadores",
     Callback = function()
