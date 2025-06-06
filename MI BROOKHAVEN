@@ -21,7 +21,7 @@ local Window = redzlib:MakeWindow({
 })
 
 Window:AddMinimizeButton({
-    Button = { Image = "rbxassetid://127317281814903", BackgroundTransparency = 0 },
+    Button = { Image = "rbxassetid://127944178494237", BackgroundTransparency = 0 },
     Corner = { CornerRadius = UDim.new(35, 1) },
 })
 
@@ -35,13 +35,13 @@ Tab1:AddDiscordInvite({
     Invite = "https://discord.gg/DDMDqKWynm"
 })
 
-local Paragraph = Tab1:AddParagraph({"MI TEAM", "obrigado por ler"})
+local Paragraph = Tab1:AddParagraph({"FEITO POR", "MI TEAM"})
 
-local Paragraph = Tab1:AddParagraph({"MI OWNER 2", "ALLYSON"})
+local Paragraph = Tab1:AddParagraph({"DONO", "MI TEAM OWNER"})
 
-local Paragraph = Tab1:AddParagraph({"MI OWNER 1", "PEDRO"})
+local Paragraph = Tab1:AddParagraph({"SUB DONO", "MI TEAM OWNER 2"})
 
-local Paragraph = Tab1:AddParagraph({"MI CREATOR", "MI"})
+local Paragraph = Tab1:AddParagraph({"MI", "MI"})
 
 local Paragraph = Tab1:AddParagraph({"MI TEAM", "PARA SEMPRE"})
 
@@ -65,7 +65,7 @@ Tab1:AddButton({
     end
 })
 
-local TabPlayers = Window:MakeTab({ "Players", "rbxassetid://10723415903" })
+local TabPlayers = Window:MakeTab({ "Players", "rbxassetid://10734962068" })
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -83,10 +83,28 @@ for _, p in pairs(Players:GetPlayers()) do
     end
 end
 
--- Criar o Dropdown
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local selectedPlayer = nil
+local currentPlayers = {}
+
+-- Função que retorna lista de players (sem o local player)
+local function ObterListaPlayers()
+    local lista = {}
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            table.insert(lista, plr.Name)
+        end
+    end
+    return #lista > 0 and lista or {"Nenhum jogador"}
+end
+
+-- Cria dropdown uma vez só, com lista inicial
+currentPlayers = ObterListaPlayers()
 local PlayerDropdown = TabPlayers:AddDropdown({
     Name = "Selecionar Player",
-    Options = #currentPlayers > 0 and currentPlayers or {"Nenhum jogador"},
+    Options = currentPlayers,
     Callback = function(Value)
         if Value and Value ~= "Nenhum jogador" then
             selectedPlayer = Value
@@ -96,42 +114,32 @@ local PlayerDropdown = TabPlayers:AddDropdown({
     end
 })
 
--- Função para atualizar lista de players
+-- Função para atualizar lista no dropdown (sem destruir)
 local function AtualizarListaPlayers()
-    currentPlayers = {}
-    for _, plr in ipairs(Players:GetPlayers()) do
-        if plr ~= LocalPlayer then
-            table.insert(currentPlayers, plr.Name)
-        end
-    end
-
-    local novaLista = #currentPlayers > 0 and currentPlayers or {"Nenhum jogador"}
-
+    currentPlayers = ObterListaPlayers()
     if not table.find(currentPlayers, selectedPlayer) then
         selectedPlayer = nil
     end
-
-    PlayerDropdown:SetOptions(novaLista)
+    -- Atualiza a lista dentro do dropdown
+    PlayerDropdown:SetOptions(currentPlayers)
 end
 
--- Conectar eventos do jogo para atualizar automaticamente
+-- Botão para atualizar manualmente
+TabPlayers:AddButton({
+    Name = "Atualizar Jogadores",
+    Callback = AtualizarListaPlayers
+})
+
+-- Atualiza automaticamente ao entrar/sair jogadores
 Players.PlayerAdded:Connect(function(p)
     if p ~= LocalPlayer then
         AtualizarListaPlayers()
     end
 end)
-
-Players.PlayerRemoving:Connect(function(p)
+Players.PlayerRemoving:Connect(function()
     AtualizarListaPlayers()
 end)
 
--- Botão só chama a função
-TabPlayers:AddButton({
-    Name = "Atualizar Jogadores",
-    Callback = function()
-        AtualizarListaPlayers()
-    end
-})
 
 TabPlayers:AddToggle({
     Name = "View",
@@ -853,7 +861,7 @@ loadstring(game:HttpGet("https://pastebin.com/raw/2PEwAWga"))
     end
 })
 
-local TabScripts = Window:MakeTab({ "scripts", "rbxassetid://10723415903" })
+local TabScripts = Window:MakeTab({ "scripts", "rbxassetid://10747822677" })
 
 TabScripts:AddButton({
     Name = "iy",
@@ -867,4 +875,5 @@ TabScripts:AddButton({
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/JaozinScripts/Gumball-Hub/refs/heads/main/GumballHubRetorn2.1.1.1.lua"))()
     end
+
 })
