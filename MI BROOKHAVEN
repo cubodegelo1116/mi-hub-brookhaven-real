@@ -849,11 +849,35 @@ TabScripts:AddButton({
         loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
     end
 })
-
 TabScripts:AddButton({
     Name = "gumball hub",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/JaozinScripts/Gumball-Hub/refs/heads/main/GumballHubRetorn2.1.1.1.lua"))()
     end
+})
 
+local TabTeleport = Window:MakeTab({ "teleport", "rbxassetid://10747822677" })
+
+TabTeleport:AddButton({
+    Name = "Free Premium",
+    Callback = function()
+        local targetCFrame = CFrame.new(-4, -134, 14)
+        if LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character:PivotTo(targetCFrame)
+        else
+            warn("Personagem ou HumanoidRootPart não encontrado.")
+        end
+    end
+})
+
+TabTeleport:AddButton({
+    Name = "Casa 28",
+    Callback = function()
+        local targetCFrame = CFrame.new(-100, 3, 1068)
+        if LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character:PivotTo(targetCFrame)
+        else
+            warn("Personagem ou HumanoidRootPart não encontrado.")
+        end
+    end
 })
