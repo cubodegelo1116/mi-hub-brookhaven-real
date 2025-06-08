@@ -100,7 +100,7 @@ local function findPlayerByPartialName(partial)
 end
 
 local PlayerTextbox = TabPlayers:AddTextBox({
-    Name = "Digite o nome (ou parte) do player",
+    Name = "digite o nick para selecionar alguem",
     Default = "",
     TextDisappear = false,
     Callback = function(value)
