@@ -85,60 +85,40 @@ end
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-
 local selectedPlayer = nil
-local currentPlayers = {}
 
--- Função que retorna lista de players (sem o local player)
-local function ObterListaPlayers()
-    local lista = {}
+local function findPlayerByPartialName(partial)
+    partial = partial:lower()
     for _, plr in ipairs(Players:GetPlayers()) do
         if plr ~= LocalPlayer then
-            table.insert(lista, plr.Name)
+            if plr.Name:lower():find(partial) then
+                return plr.Name
+            end
         end
     end
-    return #lista > 0 and lista or {"Nenhum jogador"}
+    return nil
 end
 
--- Cria dropdown uma vez só, com lista inicial
-currentPlayers = ObterListaPlayers()
-local PlayerDropdown = TabPlayers:AddDropdown({
-    Name = "Selecionar Player",
-    Options = currentPlayers,
-    Callback = function(Value)
-        if Value and Value ~= "Nenhum jogador" then
-            selectedPlayer = Value
-        else
+local PlayerTextbox = TabPlayers:AddTextBox({
+    Name = "Digite o nome (ou parte) do player",
+    Default = "",
+    TextDisappear = false,
+    Callback = function(value)
+        if value == "" then
             selectedPlayer = nil
+            print("Nenhum player selecionado")
+        else
+            local found = findPlayerByPartialName(value)
+            if found then
+                selectedPlayer = found
+                print("Player selecionado:", selectedPlayer)
+            else
+                selectedPlayer = nil
+                print("Nenhum player corresponde ao texto")
+            end
         end
     end
 })
-
--- Função para atualizar lista no dropdown (sem destruir)
-local function AtualizarListaPlayers()
-    currentPlayers = ObterListaPlayers()
-    if not table.find(currentPlayers, selectedPlayer) then
-        selectedPlayer = nil
-    end
-    -- Atualiza a lista dentro do dropdown
-    PlayerDropdown:SetOptions(currentPlayers)
-end
-
--- Botão para atualizar manualmente
-TabPlayers:AddButton({
-    Name = "Atualizar Jogadores",
-    Callback = AtualizarListaPlayers
-})
-
--- Atualiza automaticamente ao entrar/sair jogadores
-Players.PlayerAdded:Connect(function(p)
-    if p ~= LocalPlayer then
-        AtualizarListaPlayers()
-    end
-end)
-Players.PlayerRemoving:Connect(function()
-    AtualizarListaPlayers()
-end)
 
 
 TabPlayers:AddToggle({
