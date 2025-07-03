@@ -4271,12 +4271,13 @@ Tab:AddSection({"Audio All Players"})
 
 -- Lista de áudios
 local audios = {
+    {Name = "c00lkidd theme (3 sec)", ID = 138081566},
     {Name = "Yamete Kudasai", ID = 108494476595033},
     {Name = "Gritinho", ID = 5710016194},
     {Name = "Jumpscare Horroroso", ID = 85435253347146},
     {Name = "Áudio Alto", ID = 6855150757},
     {Name = "Ruído", ID = 120034877160791},
-    {Name = "Jumpscare 2", ID = 110637995610528},
+    {Name = "Jumpscare Granny (Game Over)", ID = 1592934514},
     {Name = "Risada Da Bruxa Minecraft", ID = 116214940486087},
     {Name = "The Boiled One", ID = 137177653817621},
     {Name = "Deitei Um Ave Maria Doido", ID = 128669424001766},
@@ -4289,7 +4290,7 @@ local audios = {
     {Name = "UHHHHH COFFCOFF", ID = 7056720271},
     {Name = "SUS", ID = 7153419575},
     {Name = "Sonic.exe", ID = 2496367477},
-    {Name = "Tubers93 1", ID = 270145703},
+    {Name = "Tubers93 good", ID = 103215672097028},
     {Name = "Tubers93 2", ID = 18131809532},
     {Name = "John's Laugh", ID = 130759239},
     {Name = "Nao sei KKKK", ID = 6549021381},
@@ -4372,7 +4373,7 @@ local function playLoopedAudio()
             warn("Nenhum áudio selecionado!")
         end
 
-        task.wait(0.5) -- Pequeno delay para evitar sobrecarga
+        task.wait(4) -- Pequeno delay para evitar sobrecarga
     end
 end
 
