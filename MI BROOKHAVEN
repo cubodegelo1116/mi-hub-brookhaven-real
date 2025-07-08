@@ -5092,7 +5092,7 @@ local function ChangeCarSpeedAndTurbo(speedValue, turboValue)
             body.Turbo.Value = turboValue
             wait(0.1)
             redzlib:MakeNotification({
-                Name = "Mafia Hub",
+                Name = "MI Hub",
                 Content = "Done, You can Move Now!",
                 Time = 5
             })
@@ -6141,7 +6141,7 @@ LocalPlayerTab:AddToggle({
 })
 
 LocalPlayerTab:AddButton({
-    Name = "Spam chat Hacked By Mafia",
+    Name = "Spam chat Hacked By MI TEAM",
     Callback = function()
         if game:GetService("TextChatService").ChatVersion == Enum.ChatVersion.TextChatService then 
             game:GetService("TextChatService").TextChannels.RBXGeneral:SendAsync("msg\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\rServer: Hacked by MI TEAM")
