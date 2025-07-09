@@ -1812,8 +1812,8 @@ local function ActiveAutoFling(targetPlayer)
                     local FPos = function(BasePart, Pos, Ang)
                         RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
                         Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
-                        RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
-                        RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+                        RootPart.Velocity = Vector3.new(1e30, 1e30 * 10, 1e30)
+                        RootPart.RotVelocity = Vector3.new(1e30, 1e30, 1e30)
                     end
 
                     local SFBasePart = function(BasePart)
@@ -8240,18 +8240,18 @@ ToolsTab:AddButton({
     end
 })
 
-local UniversalTab = Window:MakeTab({"Scripts Universais", "plane"})
+local UniversalTab = Window:MakeTab({"Scripts", "plane"})
 
--- Seção para Scripts Universais
+-- Seção para Scripts 
 Section = UniversalTab:AddSection({
-    Name = "Scripts Universais"
+    Name = "Scripts"
 })
 
--- Botão para Rael Hub Brook
+-- Botão para coquette hub
 UniversalTab:AddButton({
-    Name = "Rael Hub Brook",
+    Name = "coquette hub",
     Callback = function()
-        loadstring(game:HttpGet("https://rawscripts.net/raw/The-Mimic-Rael-Hub-20921"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Daivd977/Deivd999/refs/heads/main/pessal"))()
     end
 })
 
