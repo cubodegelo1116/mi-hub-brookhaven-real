@@ -5,7 +5,7 @@ local mensagens = {
 	"EXECUTADO",
 	"CARREGANDO",
 	"MI TEAM BROOKHAVEN",
-        "\r"
+        " "
 }
 
 for _, mensagem in ipairs(mensagens) do
