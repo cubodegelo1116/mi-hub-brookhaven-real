@@ -4,7 +4,8 @@ local selectedPlayer = nil
 local mensagens = {
 	"EXECUTADO",
 	"CARREGANDO",
-	"MI TEAM BROOKHAVEN"
+	"MI TEAM BROOKHAVEN",
+        "\r"
 }
 
 for _, mensagem in ipairs(mensagens) do
@@ -273,7 +274,7 @@ Label.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Label.BorderSizePixel = 0
 Label.Size = UDim2.new(1, 0, 0.160583943, 0)
 Label.FontFace = Font.new("rbxasset://fonts/families/Nunito.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal)
-Label.Text = "Bring Parts | Made by: Lusquinha_067"
+Label.Text = "Bring Parts | Made by: MI TEAM"
 Label.TextColor3 = Color3.fromRGB(255, 255, 255)
 Label.TextScaled = true
 Label.TextSize = 14.000
