@@ -4644,29 +4644,31 @@ local Section = Tab:AddSection({
 -- Toggle State for Lag Laptop
 local toggles = { LagLaptop = false }
 
--- Function to Simulate Normal Click
-local function clickNormally(object)
-    local clickDetector = object:FindFirstChildWhichIsA("ClickDetector")
+-- Função para clicar diretamente na Part
+local function clickLaptopPart(part)
+    local clickDetector = part:FindFirstChildWhichIsA("ClickDetector")
     if clickDetector then
         fireclickdetector(clickDetector)
-    end
-end
-
--- Function to Lag Game with Laptop
-local function lagarJogoLaptop(laptopPath, maxTeleports)
-    if laptopPath then
-        local teleportCount = 0
-        while teleportCount < maxTeleports and toggles.LagLaptop do
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = laptopPath.CFrame
-            clickNormally(laptopPath)
-            teleportCount = teleportCount + 1
-            wait(0.0001)
-        end
     else
-        warn("Laptop not found.")
+        warn("ClickDetector não encontrado diretamente na Part:", part.Name)
     end
 end
 
+-- Função principal de lag
+local function lagarJogoLaptop(laptopPart, maxClicks)
+    local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+    local hrp = character:WaitForChild("HumanoidRootPart")
+
+    local clickCount = 0
+    while toggles.LagLaptop and clickCount < maxClicks do
+        hrp.CFrame = laptopPart.CFrame + Vector3.new(0, 3, 0)
+        clickLaptopPart(laptopPart)
+        clickCount += 1
+        task.wait(0.05) -- Pequeno delay pra servidor processar
+    end
+end
+
+-- Toggle que ativa a função de lag com a Part Laptop
 Tab:AddToggle({
     Name = "Lag with Laptop",
     Default = false,
@@ -4677,20 +4679,18 @@ Tab:AddToggle({
                 and workspace.WorkspaceCom:FindFirstChild("001_GiveTools")
                 and workspace.WorkspaceCom["001_GiveTools"]:FindFirstChild("Laptop")
 
-            if laptopPart then
+            if laptopPart and laptopPart:IsA("Part") then
                 spawn(function()
-                    lagarJogoLaptop(laptopPart)
+                    lagarJogoLaptop(laptopPart, 999999999)
                 end)
             else
-                warn("Laptop not found.")
+                warn("Laptop Part não encontrada ou não é uma Part.")
             end
         else
-            print("Lag with Laptop deactivated.")
+            print("Lag with Laptop desativado.")
         end
     end
 })
-
-
 -- Lag Laptop Paragraph
 Tab:AddParagraph({
 "Lag Information",
