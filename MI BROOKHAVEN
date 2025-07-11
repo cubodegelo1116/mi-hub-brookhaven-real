@@ -1110,115 +1110,7 @@ end
         end
     })
 
-    Troll:AddToggle({
-    Name = "ESP Completo",
-    Default = false,
-    Callback = function(enabled)
-        local Players = game:GetService("Players")
-        local RunService = game:GetService("RunService")
-        local Camera = workspace.CurrentCamera
-        local LocalPlayer = Players.LocalPlayer
-
-        local espObjects = {}
-        local running = false
-
-        local function createESP(player)
-            if player == LocalPlayer then return end
-            local box = Drawing.new("Square")
-            box.Thickness = 1
-            box.Color = Color3.fromRGB(0, 255, 0)
-            box.Filled = false
-            box.Visible = false
-
-            local nameText = Drawing.new("Text")
-            nameText.Size = 14
-            nameText.Center = true
-            nameText.Outline = true
-            nameText.Color = Color3.new(1, 1, 1)
-            nameText.Visible = false
-
-            local distanceText = Drawing.new("Text")
-            distanceText.Size = 13
-            distanceText.Center = true
-            distanceText.Outline = true
-            distanceText.Color = Color3.fromRGB(180, 180, 180)
-            distanceText.Visible = false
-
-            espObjects[player] = {
-                box = box,
-                name = nameText,
-                distance = distanceText
-            }
-        end
-
-        local function removeESP(player)
-            local esp = espObjects[player]
-            if esp then
-                esp.box:Remove()
-                esp.name:Remove()
-                esp.distance:Remove()
-                espObjects[player] = nil
-            end
-        end
-
-        if enabled then
-            running = true
-            for _, p in pairs(Players:GetPlayers()) do
-                createESP(p)
-            end
-
-            Players.PlayerAdded:Connect(createESP)
-            Players.PlayerRemoving:Connect(removeESP)
-
-            RunService.RenderStepped:Connect(function()
-                if not running then return end
-                for player, esp in pairs(espObjects) do
-                    local char = player.Character
-                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                    local head = char and char:FindFirstChild("Head")
-
-                    if hrp and head and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0 then
-                        local pos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
-                        if onScreen then
-                            local size = Vector2.new(50 / (pos.Z / 100), 100 / (pos.Z / 100))
-                            local topLeft = Vector2.new(pos.X - size.X / 2, pos.Y - size.Y / 2)
-
-                            esp.box.Size = size
-                            esp.box.Position = topLeft
-                            esp.box.Visible = true
-
-                            esp.name.Text = player.Name
-                            esp.name.Position = Vector2.new(pos.X, pos.Y - size.Y / 2 - 16)
-                            esp.name.Visible = true
-
-                            local distance = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude)
-                            esp.distance.Text = tostring(distance) .. " studs"
-                            esp.distance.Position = Vector2.new(pos.X, pos.Y - size.Y / 2)
-                            esp.distance.Visible = true
-                        else
-                            esp.box.Visible = false
-                            esp.name.Visible = false
-                            esp.distance.Visible = false
-                        end
-                    else
-                        esp.box.Visible = false
-                        esp.name.Visible = false
-                        esp.distance.Visible = false
-                    end
-                end
-            end)
-        else
-            running = false
-            for _, esp in pairs(espObjects) do
-                esp.box:Remove()
-                esp.name:Remove()
-                esp.distance:Remove()
-            end
-            espObjects = {}
-        end
-    end
-})
-
+   
     Troll:AddButton({
         Name = "Teleport to Player",
         Callback = function()
@@ -4782,19 +4674,54 @@ Tab:AddToggle({
     Callback = function(state)
         toggles.LagLaptop = state
         if state then
-            local laptopPath = workspace:FindFirstChild("WorkspaceCom"):FindFirstChild("001_GiveTools"):FindFirstChild("Laptop")
-            if laptopPath then
+            
+local function lagarJogoLaptop(laptopPart)
+    if not laptopPart then
+        warn("Laptop not found.")
+        return
+    end
+
+    local clickDetector = laptopPart:FindFirstChildWhichIsA("ClickDetector")
+    if not clickDetector then
+        warn("ClickDetector not found on Laptop.")
+        return
+    end
+
+    while toggles.LagLaptop do
+        -- Teleporta para o laptop
+        local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = laptopPart.CFrame
+        end
+
+        fireclickdetector(clickDetector)
+        wait(0.1) -- delay para evitar bloqueio
+    end
+end
+
+Tab:AddToggle({
+    Name = "Lag with Laptop",
+    Default = false,
+    Callback = function(state)
+        toggles.LagLaptop = state
+        if state then
+            local laptopPart = workspace:FindFirstChild("WorkspaceCom")
+                and workspace.WorkspaceCom:FindFirstChild("001_GiveTools")
+                and workspace.WorkspaceCom["001_GiveTools"]:FindFirstChild("Laptop")
+
+            if laptopPart then
                 spawn(function()
-                    lagarJogoLaptop(laptopPath, 999999999)
+                    lagarJogoLaptop(laptopPart)
                 end)
             else
                 warn("Laptop not found.")
             end
         else
-            print("Lag with Laptop desactivated.")
+            print("Lag with Laptop deactivated.")
         end
     end
 })
+
 
 -- Lag Laptop Paragraph
 Tab:AddParagraph({
