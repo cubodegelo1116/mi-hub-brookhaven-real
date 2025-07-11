@@ -5,7 +5,7 @@ local mensagens = {
 	"EXECUTADO",
 	"CARREGANDO",
 	"MI TEAM BROOKHAVEN",
-        " "
+        " "
 }
 
 for _, mensagem in ipairs(mensagens) do
@@ -4664,38 +4664,6 @@ local function lagarJogoLaptop(laptopPath, maxTeleports)
         end
     else
         warn("Laptop not found.")
-    end
-end
-
--- Lag Laptop Toggle
-Tab:AddToggle({
-    Name = "Lag with Laptop",
-    Default = false,
-    Callback = function(state)
-        toggles.LagLaptop = state
-        if state then
-            
-local function lagarJogoLaptop(laptopPart)
-    if not laptopPart then
-        warn("Laptop not found.")
-        return
-    end
-
-    local clickDetector = laptopPart:FindFirstChildWhichIsA("ClickDetector")
-    if not clickDetector then
-        warn("ClickDetector not found on Laptop.")
-        return
-    end
-
-    while toggles.LagLaptop do
-        -- Teleporta para o laptop
-        local hrp = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            hrp.CFrame = laptopPart.CFrame
-        end
-
-        fireclickdetector(clickDetector)
-        wait(0.1) -- delay para evitar bloqueio
     end
 end
 
