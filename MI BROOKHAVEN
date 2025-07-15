@@ -29,9 +29,6 @@ Window:AddMinimizeButton({
 
 local InfoTab = Window:MakeTab({ Title = "Info", Icon = "rbxassetid://15309138473" })
 
-
-
-
 InfoTab:AddParagraph({ "Discord", "https://discord.gg/DDMDqKWynm" })
 InfoTab:AddParagraph({ "FEITO POR", "MI TEAM" })
 InfoTab:AddParagraph({ "MI TEAM", "PARA SEMPRE" })
@@ -44,6 +41,57 @@ InfoTab:AddButton({
         TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
     end
 })
+
+InfoTab:AddButton({
+    Name = "ServerHop ",
+    Callback = function()
+        local HttpService = game:GetService("HttpService")
+        local TeleportService = game:GetService("TeleportService")
+        local LocalPlayer = game:GetService("Players").LocalPlayer
+        local PlaceId = game.PlaceId
+
+        local function serverRequest(url)
+            if http_request then
+                return http_request({Url = url, Method = "GET"})
+            elseif syn and syn.request then
+                return syn.request({Url = url, Method = "GET"})
+            elseif fluxus and fluxus.request then
+                return fluxus.request({Url = url, Method = "GET"})
+            elseif request then
+                return request({Url = url, Method = "GET"})
+            else
+                warn("Exploit não suporta http_request.")
+                return nil
+            end
+        end
+
+        local function GetServers()
+            local url = "https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?limit=100"
+            local data = serverRequest(url)
+            if not data then return {} end
+
+            local body = data.Body or data.body
+            local decoded = HttpService:JSONDecode(body)
+            local servers = {}
+
+            for _, server in pairs(decoded.data or {}) do
+                if server.playing < server.maxPlayers and server.id ~= game.JobId then
+                    table.insert(servers, server.id)
+                end
+            end
+            return servers
+        end
+
+        local servers = GetServers()
+        if #servers > 0 then
+            local chosen = servers[math.random(1, #servers)]
+            TeleportService:TeleportToPlaceInstance(PlaceId, chosen, LocalPlayer)
+        else
+            warn("Nenhum servidor diferente encontrado.")
+        end
+    end
+})
+
 
 InfoTab:AddSection({ "Dev Console" })
 InfoTab:AddButton({
@@ -1134,8 +1182,10 @@ end
         end
     })
 
+    
+    
     Troll:AddToggle({
-        Name = "View playerNames",
+        Name = "View",
         Default = false,
         Callback = function(value)
             local Camera = workspace.CurrentCamera
@@ -1172,6 +1222,98 @@ end
             end
         end
     })
+
+   local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local espNames = {}
+local espConnection1, espConnection2, updateLoop
+
+Troll:AddToggle({
+    Name = "ESP",
+    Default = false,
+    Callback = function(value)
+        local function CreateNameTag(player)
+            if player == LocalPlayer or espNames[player] then return end
+
+            local function onCharacter(char)
+                local head = char:WaitForChild("Head", 5)
+                if not head or espNames[player] then return end
+
+                local billboard = Instance.new("BillboardGui")
+                billboard.Name = "ESP_Name"
+                billboard.AlwaysOnTop = true
+                billboard.Size = UDim2.new(0, 100, 0, 20)
+                billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+                billboard.Adornee = head
+                billboard.Parent = head
+
+                local nameLabel = Instance.new("TextLabel")
+                nameLabel.BackgroundTransparency = 1
+                nameLabel.Size = UDim2.new(1, 0, 1, 0)
+                nameLabel.Text = player.Name .. " (0)"
+                nameLabel.TextColor3 = Color3.new(1, 1, 1)
+                nameLabel.TextStrokeTransparency = 0
+                nameLabel.TextScaled = true
+                nameLabel.Font = Enum.Font.GothamBold
+                nameLabel.Name = "NameTag"
+                nameLabel.Parent = billboard
+
+                espNames[player] = billboard
+            end
+
+            if player.Character then
+                onCharacter(player.Character)
+            end
+
+            player.CharacterAdded:Connect(onCharacter)
+        end
+
+        local function RemoveAllTags()
+            for _, gui in pairs(espNames) do
+                if gui then gui:Destroy() end
+            end
+            table.clear(espNames)
+        end
+
+        local function UpdateDistances()
+            while value do
+                for player, gui in pairs(espNames) do
+                    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                        local dist = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude)
+                        local nameLabel = gui:FindFirstChild("NameTag")
+                        if nameLabel then
+                            nameLabel.Text = player.Name .. " (" .. dist .. " studs)"
+                        end
+                    end
+                end
+                task.wait(0.3)
+            end
+        end
+
+        if value then
+            for _, player in pairs(Players:GetPlayers()) do
+                CreateNameTag(player)
+            end
+
+            espConnection1 = Players.PlayerAdded:Connect(CreateNameTag)
+            espConnection2 = Players.PlayerRemoving:Connect(function(player)
+                if espNames[player] then
+                    espNames[player]:Destroy()
+                    espNames[player] = nil
+                end
+            end)
+
+            -- Iniciar loop de atualização
+            updateLoop = task.spawn(UpdateDistances)
+        else
+            RemoveAllTags()
+            if espConnection1 then espConnection1:Disconnect() espConnection1 = nil end
+            if espConnection2 then espConnection2:Disconnect() espConnection2 = nil end
+            if updateLoop then task.cancel(updateLoop) updateLoop = nil end
+        end
+    end
+})
+
 
     local MethodSection = Troll:AddSection({ Name = "Métodos" })
 
@@ -3775,7 +3917,21 @@ local function GetPlayerNames()
     return PlayerNames
 end
 
--- Dropdown de seleÃ§Ã£o de jogador
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function GetPlayerNames()
+    local names = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(names, player.Name)
+        end
+    end
+    return names
+end
+
+local Target = ""
+
 local Dropdown = Tab:AddDropdown({
     Name = "Choose Player",
     Options = GetPlayerNames(),
@@ -3785,13 +3941,17 @@ local Dropdown = Tab:AddDropdown({
     end
 })
 
--- Atualiza opÃ§Ãµes do dropdown quando alguÃ©m entra ou sai
-local function UpdateDropdown()
-    Dropdown:Refresh(GetPlayerNames(), true)
-end
+Tab:AddButton({
+    Name = "Refresh Player List",
+    Callback = function()
+        if Dropdown then
+            Dropdown:Set(GetPlayerNames())
+            -- opcional: resetar seleção se quiser
+            Dropdown:SetValue("")
+        end
+    end
+})
 
-Players.PlayerAdded:Connect(UpdateDropdown)
-Players.PlayerRemoving:Connect(UpdateDropdown)
 
 Tab:AddButton({
     Name = "Copy Avatar",
@@ -3976,41 +4136,33 @@ local function getHouseList()
     return Tabela
 end
 
--- Dropdown para selecionar casas
-pcall(function()
-    HouseTab:AddDropdown({
-        Name = "Choose a House",
-        Options = getHouseList(),
-        Default = "...",
-        Callback = function(Value)
-            SelectHouse = Value
-            if NoclipDoor then
-                NoclipDoor:Set(false)
-            end
-            print("Casa selecionada: " .. tostring(Value))
-        end
-    })
-end)
-
 -- Função para atualizar a lista de casas
+-- Crie o dropdown uma vez e guarde a referência
+local houseDropdown = HouseTab:AddDropdown({
+    Name = "Choose a House",
+    Options = getHouseList(),
+    Default = "...",
+    Callback = function(Value)
+        SelectHouse = Value
+        if NoclipDoor then
+            NoclipDoor:Set(false)
+        end
+    end
+})
+
+-- Agora só atualize as opções com Set()
 local function DropdownHouseUpdate()
     local Tabela = getHouseList()
     print("DropdownHouseUpdate called. Houses found:", #Tabela)
-    pcall(function()
-        HouseTab:ClearDropdown("Selecione a Casa") -- Tentar limpar dropdown, se suportado
-        HouseTab:AddDropdown({
-            Name = "Choose a House",
-            Options = Tabela,
-            Default = "...",
-            Callback = function(Value)
-                SelectHouse = Value
-                if NoclipDoor then
-                    NoclipDoor:Set(false)
-                end
-            end
-        })
-    end)
+    if houseDropdown and #Tabela > 0 then
+        houseDropdown:Set(Tabela)
+        -- opcional: resetar valor selecionado
+        houseDropdown:SetValue("...")
+    else
+        warn("Dropdown não encontrado ou nenhuma casa disponível.")
+    end
 end
+
 
 -- Inicializar dropdown
 pcall(DropdownHouseUpdate)
@@ -4653,13 +4805,13 @@ local Section = Tab:AddSection({
 -- Toggle State for Lag Laptop
 local toggles = { LagLaptop = false }
 
--- Função para clicar diretamente na Part
+-- Função para clicar na part via ClickDetector
 local function clickLaptopPart(part)
     local clickDetector = part:FindFirstChildWhichIsA("ClickDetector")
     if clickDetector then
         fireclickdetector(clickDetector)
     else
-        warn("ClickDetector não encontrado diretamente na Part:", part.Name)
+        warn("ClickDetector não encontrado na part: "..part.Name)
     end
 end
 
@@ -4673,11 +4825,11 @@ local function lagarJogoLaptop(laptopPart, maxClicks)
         hrp.CFrame = laptopPart.CFrame + Vector3.new(0, 3, 0)
         clickLaptopPart(laptopPart)
         clickCount += 1
-        task.wait(0.05) -- Pequeno delay pra servidor processar
+        task.wait(0.05) -- Delay pra o servidor processar
     end
 end
 
--- Toggle que ativa a função de lag com a Part Laptop
+-- Toggle que ativa o lag com laptop
 Tab:AddToggle({
     Name = "Lag with Laptop",
     Default = false,
@@ -4688,18 +4840,19 @@ Tab:AddToggle({
                 and workspace.WorkspaceCom:FindFirstChild("001_GiveTools")
                 and workspace.WorkspaceCom["001_GiveTools"]:FindFirstChild("Laptop")
 
-            if laptopPart and laptopPart:IsA("Part") then
+            if laptopPart and laptopPart:IsA("BasePart") then
                 spawn(function()
                     lagarJogoLaptop(laptopPart, 999999999)
                 end)
             else
-                warn("Laptop Part não encontrada ou não é uma Part.")
+                warn("Laptop Part não encontrada ou não é uma BasePart.")
             end
         else
             print("Lag with Laptop desativado.")
         end
     end
 })
+
 -- Lag Laptop Paragraph
 Tab:AddParagraph({
 "Lag Information",
@@ -4714,41 +4867,59 @@ local Section = Tab:AddSection({
 -- Toggle State for Lag Phone
 toggles.LagPhone = false
 
--- Function to Lag Game with Phone
-local function lagarJogoPhone(phonePath, maxTeleports)
-    if phonePath then
-        local teleportCount = 0
-        while teleportCount < maxTeleports and toggles.LagPhone do
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = phonePath.CFrame
-            clickNormally(phonePath)
-            teleportCount = teleportCount + 1
-            wait(0.01)
-        end
+-- Função para clicar no ClickDetector da part Phone
+local function clickPhonePart(part)
+    if not part then return end
+    local clickDetector = part:FindFirstChildWhichIsA("ClickDetector")
+    if clickDetector then
+        fireclickdetector(clickDetector)
     else
-        warn("Phone not found.")
+        warn("ClickDetector não encontrado na parte Phone!")
     end
 end
 
--- Lag Phone Toggle
+-- Função principal para lag com phone
+local function lagarJogoPhone(phonePart, maxClicks)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local hrp = character:WaitForChild("HumanoidRootPart")
+
+    local clickCount = 0
+    while toggles.LagPhone and clickCount < maxClicks do
+        hrp.CFrame = phonePart.CFrame + Vector3.new(0, 3, 0)
+        clickPhonePart(phonePart)
+        clickCount += 1
+        task.wait(0.05) -- ajuste o delay pra controlar a velocidade
+    end
+end
+
+-- Toggle Lag Phone
 Tab:AddToggle({
-    Name = "Lag with phone.",
+    Name = "Lag with Phone",
     Default = false,
     Callback = function(state)
         toggles.LagPhone = state
         if state then
-            local phonePath = workspace:FindFirstChild("WorkspaceCom"):FindFirstChild("001_CommercialStores"):FindFirstChild("CommercialStorage1"):FindFirstChild("Store"):FindFirstChild("Tools"):FindFirstChild("Iphone")
-            if phonePath then
+            local phonePart = workspace:FindFirstChild("WorkspaceCom")
+                and workspace.WorkspaceCom:FindFirstChild("001_CommercialStores")
+                and workspace.WorkspaceCom["001_CommercialStores"]:FindFirstChild("CommercialStorage1")
+                and workspace.WorkspaceCom["001_CommercialStores"]["CommercialStorage1"]:FindFirstChild("Store")
+                and workspace.WorkspaceCom["001_CommercialStores"]["CommercialStorage1"]["Store"]:FindFirstChild("Tools")
+                and workspace.WorkspaceCom["001_CommercialStores"]["CommercialStorage1"]["Store"]["Tools"]:FindFirstChild("Iphone")
+
+            if phonePart and phonePart:IsA("BasePart") then
                 spawn(function()
-                    lagarJogoPhone(phonePath, 999999)
+                    lagarJogoPhone(phonePart, 999999999)
                 end)
             else
-                warn("Phone not found.")
+                warn("Phone part não encontrada ou não é uma BasePart.")
             end
         else
-            print("Lag with Phone desactivated.")
+            print("Lag with Phone desativado.")
         end
     end
 })
+
 
 -- Lag Phone Paragraph
 Tab:AddParagraph({
@@ -5832,13 +6003,28 @@ local Section = ChildTab:AddSection({
     Name = "Child"
 })
 
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
 local chasingplayer = nil
+
+-- Função que retorna a lista atualizada de jogadores (exceto o local)
+local function updatePlayerList()
+    local playerList = {}
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(playerList, player.Name)
+        end
+    end
+    return playerList
+end
+
 local playerChild = ChildTab:AddDropdown({
     Name = "Select a player to chase",
-    Options = players,
+    Options = updatePlayerList(),  -- Inicializa com lista atualizada
     Default = "",
     Callback = function(selected)
-        if game.Players:FindFirstChild(selected) then
+        if Players:FindFirstChild(selected) then
             chasingplayer = selected
         else
             chasingplayer = nil
@@ -5852,17 +6038,20 @@ ChildTab:AddButton({
         local updatedPlayers = updatePlayerList()
         if playerChild and updatedPlayers then
             pcall(function()
-                playerChild:Refresh(updatedPlayers)
+                playerChild:Set(updatedPlayers)  -- Usa Set para atualizar opções
             end)
-            if chasingplayer and not game.Players:FindFirstChild(chasingplayer) then
+
+            -- Se o jogador selecionado não existir mais, reseta seleção
+            if chasingplayer and not Players:FindFirstChild(chasingplayer) then
                 chasingplayer = nil
                 pcall(function()
-                    playerChild:Set("")
+                    playerChild:SetValue("")  -- Reseta seleção no dropdown
                 end)
             end
         end
     end
 })
+
 
 -- Eventos de entrada/saída de players
 game.Players.PlayerAdded:Connect(function()
@@ -8315,5 +8504,3 @@ UniversalTab:AddButton({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/SAZXHUB/Control-update/main/README.md", true))()
     end
 })
-
-
