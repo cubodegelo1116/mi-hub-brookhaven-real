@@ -4356,27 +4356,59 @@ pcall(function()
     HouseTab:AddLabel("Teleport to the House You Want")
 end)
 
--- Seção para Auto Unban
-pcall(function()
-    HouseTab:AddSection({ Name = "Auto Unban" })
-end)
+local noclipEnabled = false
+local noclipConnection
 
--- Toggle para Auto Unban
-pcall(function()
-    HouseTab:AddToggle({
-        Name = "Auto Unban",
-        Default = false,
-        Callback = function(state)
-            isUnbanActive = state
-            if isUnbanActive then
-                print("Auto Unban Activated")
-                spawn(startAutoUnban)
-            else
-                print("Auto Unban Desactivated")
+local function enableNoclip()
+    noclipEnabled = true
+    local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+
+    noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+        if noclipEnabled and character then
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        else
+            if noclipConnection then
+                noclipConnection:Disconnect()
+                noclipConnection = nil
             end
         end
-    })
-end)
+    end)
+end
+
+local function disableNoclip()
+    noclipEnabled = false
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        for _, part in pairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+            end
+        end
+    end
+    if noclipConnection then
+        noclipConnection:Disconnect()
+        noclipConnection = nil
+    end
+end
+
+HouseTab:AddToggle({
+    Name = "Unban houses",
+    Default = false,
+    Callback = function(state)
+        if state then
+            print("unban activated")
+            enableNoclip()
+        else
+            print("unban desactivated")
+            disableNoclip()
+        end
+    end
+})
+
 
 -- Label após Auto Unban
 pcall(function()
