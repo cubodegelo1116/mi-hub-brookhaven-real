@@ -544,55 +544,6 @@ coroutine.wrap(JUBNQKI_fake_script)()
     end
 })
 
-TrollTab:AddSection({ "Invisible" })
-
-TrollTab:AddButton({
-    Name = "Become Invisible",
-Callback = function()
-        
-        local args = {
-    [1] = {
-        [1] = 102344834840946,
-        [2] = 70400527171038,
-        [3] = 0,
-        [4] = 0,
-        [5] = 0,
-        [6] = 0
-    }
-}
-
-game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ChangeCharacterBody"):InvokeServer(unpack(args))
-game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Wear"):InvokeServer(111858803548721)
-local allaccessories = {}
-
-for zxcwefwfecas, xcaefwefas in ipairs({
-    game.Players.LocalPlayer.Character.Humanoid.HumanoidDescription.BackAccessory,
-    game.Players.LocalPlayer.Character.Humanoid.HumanoidDescription.FaceAccessory,
-    game.Players.LocalPlayer.Character.Humanoid.HumanoidDescription.FrontAccessory,
-    game.Players.LocalPlayer.Character.Humanoid.HumanoidDescription.NeckAccessory,
-    game.Players.LocalPlayer.Character.Humanoid.HumanoidDescription.HatAccessory,
-    game.Players.LocalPlayer.Character.Humanoid.HumanoidDescription.HairAccessory,
-    game.Players.LocalPlayer.Character.Humanoid.HumanoidDescription.ShouldersAccessory,
-    game.Players.LocalPlayer.Character.Humanoid.HumanoidDescription.WaistAccessory,
-    game.Players.LocalPlayer.Character.Humanoid.HumanoidDescription.GraphicTShirt
-}) do
-    for scacvdfbdb in string.gmatch(xcaefwefas, "%d+") do
-        table.insert(allaccessories, tonumber(scacvdfbdb))
-    end
-end
-
-wait()
-
-for asdwr,asderg in ipairs(allaccessories) do
-    task.spawn(function()
-        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Wear"):InvokeServer(asderg)
-        print(asderg)
-    end)
-end
-    end
-})
-
-
 TrollTab:AddSection({ "Avatar RGB" })
 
 local colors = { "Bright red", "Lime green", "Bright blue", "Bright yellow", "Bright cyan", "Hot pink", "Royal purple" }
