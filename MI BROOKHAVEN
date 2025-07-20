@@ -2,7 +2,8 @@ local remote = game:GetService("ReplicatedStorage"):WaitForChild("RE"):WaitForCh
 local selectedPlayer = nil 
 
 local mensagens = {
-	"", -- começa vazio
+	"",
+	"",
 	"M",
 	"MI",
 	"MI ",
@@ -21,23 +22,7 @@ local mensagens = {
 	"MI TEAM BROOKHAV",
 	"MI TEAM BROOKHAVE",
 	"MI TEAM BROOKHAVEN",
-	"MI TEAM BROOKHAVE",
-	"MI TEAM BROOKHAV",
-	"MI TEAM BROOKHA",
-	"MI TEAM BROOKH",
-	"MI TEAM BROOK",
-	"MI TEAM BROO",
-	"MI TEAM BRO",
-	"MI TEAM BR",
-	"MI TEAM B",
-	"MI TEAM ",
-	"MI TEAM",
-	"MI TEA",
-	"MI TE",
-	"MI T",
-	"MI ",
-	"MI",
-	"M",
+	"",
 	"",
 }
 
@@ -47,23 +32,35 @@ for _, mensagem in ipairs(mensagens) do
 	wait(0.1)
 end
 
-local Libary = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
+local Libary = loadstring(game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/ui/refs/heads/main/ui"))()
+
+  Libary:SetTheme("PeachPuff")
+
 workspace.FallenPartsDestroyHeight = -math.huge
 
+
+
 local Window = Libary:MakeWindow({
-    Title = "MI HUB | BROOKHAVEN🏡",
-    SubTitle = "by MI TEAM",
+    Title = "MI HUB",
+    SubTitle = "        BROOKHAVEN RP| by MI TEAM",
     LoadText = "Loading MI HUB",
     Flags = "MiHub_Broookhaven"
 })
+
+
+
 Window:AddMinimizeButton({
     Button = { Image = "rbxassetid://127944178494237", BackgroundTransparency = 0 },
     Corner = { CornerRadius = UDim.new(35, 1) },
 })
 
 	local InfoTab = Window:MakeTab({ Title = "Menu", Icon = "rbxassetid://15309138473" })
-
-InfoTab:AddParagraph({ "Discord", "https://discord.gg/DDMDqKWynm" })
+InfoTab:AddDiscordInvite({
+    Name = "MI TEAM",
+    Description = "MI TEAM",
+    Logo = "rbxassetid://127944178494237",
+    Invite = "https://discord.gg/DDMDqKWynm",
+})
 InfoTab:AddParagraph({ "FEITO POR", "MI TEAM" })
 InfoTab:AddParagraph({ "MI TEAM", "PARA SEMPRE" })
 
