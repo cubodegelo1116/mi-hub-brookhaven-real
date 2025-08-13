@@ -1854,14 +1854,14 @@ local TweenService = game:GetService("TweenService")
 
 local function bounceBall(ball)
     if not ball then return end
-    local amplitude = 2 -- altura do bounce (studs)
-    local duration = 0.1 -- duração rápida do tween (segundos)
-
-    local tweenUp = TweenService:Create(ball, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = ball.CFrame * CFrame.new(0, amplitude, 0)})
-    local tweenDown = TweenService:Create(ball, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = ball.CFrame * CFrame.new(0, -amplitude, 0)})
-
+    local amplitude = 2
+    local duration = 0.1
     task.spawn(function()
         while ball and ball.Parent and getgenv().flingloop do
+            local startCFrame = ball.CFrame
+            local tweenUp = TweenService:Create(ball, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = startCFrame * CFrame.new(0, amplitude, 0)})
+            local tweenDown = TweenService:Create(ball, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = startCFrame})
+
             tweenUp:Play()
             tweenUp.Completed:Wait()
             tweenDown:Play()
@@ -1871,7 +1871,6 @@ local function bounceBall(ball)
 end
 
 local function FlingBall(target)
-
     local players = game:GetService("Players")
     local player = players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
@@ -1914,34 +1913,35 @@ local function FlingBall(target)
             bv.Parent = Ball
 
             workspace.CurrentCamera.CameraSubject = thum
-			bounceBall(Ball)
-            local StartTime = os.time()
+            bounceBall(Ball) -- aqui começa o bounce
+
             repeat
                 if troot.Velocity.Magnitude > 0 then
-                -- Cálculo da posição ajustada com base na velocidade do alvo
-                local pos_x = troot.Position.X + (troot.Velocity.X / 1.5)
-                local pos_y = troot.Position.Y + (troot.Velocity.Y / 1.5)
-                local pos_z = troot.Position.Z + (troot.Velocity.Z / 1.5)
+                    -- Posição ajustada com base na velocidade do alvo
+                    local pos_x = troot.Position.X + (troot.Velocity.X / 1.5)
+                    local pos_y = troot.Position.Y + (troot.Velocity.Y / 1.5)
+                    local pos_z = troot.Position.Z + (troot.Velocity.Z / 1.5)
 
-                -- Posiciona a bola diretamente na posição ajustada
-                local position = Vector3.new(pos_x, pos_y, pos_z)
-                Ball.CFrame = CFrame.new(position)
-                Ball.Orientation += Vector3.new(45, 60, 30)
-else
-for i, v in pairs(tchar:GetChildren()) do
-if v:IsA("BasePart") and v.CanCollide and not v.Anchored then
-Ball.CFrame = v.CFrame
-task.wait(1/6000)
-end
-end
-end
+                    local position = Vector3.new(pos_x, pos_y, pos_z)
+                    Ball.CFrame = CFrame.new(position)
+                    Ball.Orientation += Vector3.new(45, 60, 30)
+                else
+                    for i, v in pairs(tchar:GetChildren()) do
+                        if v:IsA("BasePart") and v.CanCollide and not v.Anchored then
+                            Ball.CFrame = v.CFrame
+                            task.wait(1/6000)
+                        end
+                    end
+                end
                 task.wait(1/6000)
             until troot.Velocity.Magnitude > 1000 or thum.Health <= 0 or not tchar:IsDescendantOf(workspace) or target.Parent ~= players
+
             workspace.CurrentCamera.CameraSubject = humanoid
         end
     end
 end
 
+-- Exemplo de botão para chamar a função (ajuste conforme seu setup)
 Troll:AddButton({
     Name = "Fling Ball v2",
     Callback = function()
