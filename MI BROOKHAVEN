@@ -3535,6 +3535,185 @@ workspace.CurrentCamera.CameraSubject=game.Players.LocalPlayer.Character:WaitFor
 
 local Tab = Window:MakeTab({"Avatar", "rbxassetid://10734952036"})
 
+
+Tab:AddSection({ "Avatar RGB" })
+
+local colors = { "Bright red", "Lime green", "Bright blue", "Bright yellow", "Bright cyan", "Hot pink", "Royal purple" }
+local rgbEnabled = false
+
+local function changeColor(color)
+    local args = { color }
+    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ChangeBodyColor"):FireServer(unpack(args))
+end
+
+local function toggleRGBCharacter(enabled)
+    rgbEnabled = enabled
+    if rgbEnabled then
+        while rgbEnabled do
+            for _, color in ipairs(colors) do
+                if not rgbEnabled then return end
+                changeColor(color)
+                wait(0.1)
+            end
+        end
+    end
+end
+
+Tab:AddToggle({
+    Name = "RGB Character",
+    Default = false,
+    Callback = function(value)
+        toggleRGBCharacter(value)
+    end
+})
+
+local SectionNames = Tab:AddSection({
+    Name = "Color Gradient"
+})
+------------------------------------------
+local RunService = game:GetService("RunService")
+local Remote = game:GetService("ReplicatedStorage").RE:FindFirstChild("1RPNam1eColo1r")
+
+-- Estados independentes
+local isNameDegradeActive = false
+local isBioDegradeActive = false
+
+-- Configurações separadas
+local nameConfig = {
+    color = Color3.fromRGB(255, 0, 0), -- padrão vermelho
+    speed = 0.5 -- padrão
+}
+
+local bioConfig = {
+    color = Color3.fromRGB(0, 0, 255), -- padrão azul
+    speed = 0.5 -- padrão
+}
+
+-- Lista de cores
+local availableColors = {
+    ["Branco"] = Color3.fromRGB(255, 255, 255),
+    ["Vermelho"] = Color3.fromRGB(255, 0, 0),
+    ["Verde"] = Color3.fromRGB(0, 255, 0),
+    ["Azul"] = Color3.fromRGB(0, 0, 255),
+    ["Roxo"] = Color3.fromRGB(128, 0, 128),
+    ["Ciano"] = Color3.fromRGB(0, 255, 255),
+    ["Amarelo"] = Color3.fromRGB(255, 255, 0),
+    ["Rosa (cor de macho kkk)"] = Color3.fromRGB(255, 20, 147),
+    ["Laranja"] = Color3.fromRGB(255, 165, 0),
+    ["Rainbow"] = "Rainbow"
+}
+
+-- Extrair nomes
+local colorNames = {}
+for name, _ in pairs(availableColors) do
+    table.insert(colorNames, name)
+end
+
+-- Função rainbow
+local function rainbowColor(t)
+    return Color3.fromHSV(t % 1, 1, 1)
+end
+
+-- ======== NAME CONFIG =========
+Tab:AddDropdown({
+    Name = "Name RP Color",
+    Options = colorNames,
+    Default = "Vermelho",
+    Callback = function(value)
+        nameConfig.color = availableColors[value]
+    end
+})
+
+Tab:AddSlider({
+    Name = "Velocidade Name",
+    Min = 0,
+    Max = 2,
+    Default = 1,
+    Increment = 0.1, -- permite valores como 0.5, 1.2, 1.5 etc
+    Callback = function(value)
+        nameConfig.speed = value
+    end
+})
+
+Tab:AddToggle({
+    Name = "Ativar Name Gradient",
+    Default = false,
+    Callback = function(value)
+        isNameDegradeActive = value
+    end
+})
+
+-- ======== BIO CONFIG =========
+Tab:AddDropdown({
+    Name = "Bio RP Color",
+    Options = colorNames,
+    Default = "Azul",
+    Callback = function(value)
+        bioConfig.color = availableColors[value]
+    end
+})
+
+Tab:AddSlider({
+    Name = "Velocidade Bio",
+    Min = 0,
+    Max = 2,
+    Default = 1,
+    Increment = 0.1,
+    Callback = function(value)
+        bioConfig.speed = value
+    end
+})
+
+Tab:AddToggle({
+    Name = "Ativar Bio Gradient",
+    Default = false,
+    Callback = function(value)
+        isBioDegradeActive = value
+    end
+})
+
+-- Loop degradê separado
+spawn(function()
+    local t = 0
+    while true do
+        local dt = RunService.RenderStepped:Wait()
+        t += dt
+
+        -- NAME
+        if isNameDegradeActive then
+            local currentColor
+            if nameConfig.color == "Rainbow" then
+                currentColor = rainbowColor(t * nameConfig.speed)
+            else
+                local lerpValue = math.abs(math.sin(t * nameConfig.speed * 2))
+                currentColor = Color3.new(
+                    nameConfig.color.R * lerpValue,
+                    nameConfig.color.G * lerpValue,
+                    nameConfig.color.B * lerpValue
+                )
+            end
+            Remote:FireServer("PickingRPNameColor", currentColor)
+        end
+
+        -- BIO
+        if isBioDegradeActive then
+            local currentColor
+            if bioConfig.color == "Rainbow" then
+                currentColor = rainbowColor(t * bioConfig.speed)
+            else
+                local lerpValue = math.abs(math.sin(t * bioConfig.speed * 2))
+                currentColor = Color3.new(
+                    bioConfig.color.R * lerpValue,
+                    bioConfig.color.G * lerpValue,
+                    bioConfig.color.B * lerpValue
+                )
+            end
+            Remote:FireServer("PickingRPBioColor", currentColor)
+        end
+    end
+end)
+
+
 Tab:AddSection({ Name = "Copy Skin" })
 
 
@@ -8155,6 +8334,156 @@ ToolsTab:AddButton({
     end
 })
 
+local funtab = Window:MakeTab({"Fun", "smile"})
+
+-- Variável para guardar a posição original
+local posAnterior
+
+-- Quantidade escolhida pelo usuário (default)
+local ballsAmount = 10
+
+-- Função para contar quantas bolas você tem equipadas / na mochila
+local function contarBolas()
+    local player = game.Players.LocalPlayer
+    local count = 0
+
+    -- Conta bolas na mochila (Backpack)
+    local backpack = player:WaitForChild("Backpack")
+    for _, item in ipairs(backpack:GetChildren()) do
+        if item.Name == "Basketball" then
+            count = count + 1
+        end
+    end
+
+    -- Conta bolas equipadas (Character)
+    local character = player.Character
+    if character then
+        for _, item in ipairs(character:GetChildren()) do
+            if item.Name == "Basketball" then
+                count = count + 1
+            end
+        end
+    end
+
+    return count
+end
+
+-- Função de lag que continua pegando até alcançar ballsAmount, desliga o toggle e teleporta o player
+local function lagarJogoLaptop(laptopPart)
+    local player = game.Players.LocalPlayer
+
+    while toggles.LagLaptop do
+        local currentBalls = contarBolas()
+        if currentBalls >= ballsAmount then
+            print("Quantidade desejada alcançada:", currentBalls)
+
+            toggles.LagLaptop = false -- desliga o toggle automaticamente
+
+            -- Teleporta para a posição anterior salva
+            if posAnterior then
+                local character = player.Character or player.CharacterAdded:Wait()
+                local hrp = character:WaitForChild("HumanoidRootPart")
+                hrp.CFrame = posAnterior
+                print("Teletransportado para a posição anterior.")
+            end
+
+            break
+        end
+
+        local character = player.Character or player.CharacterAdded:Wait()
+        local hrp = character:WaitForChild("HumanoidRootPart")
+        hrp.CFrame = laptopPart.CFrame + Vector3.new(0, 3, 0)
+        clickLaptopPart(laptopPart)
+        print("Pegando bola... Total agora:", currentBalls + 1)
+
+        task.wait(0.1) -- espera um pouco para o servidor processar
+    end
+end
+
+-- TextBox para definir quantidade
+funtab:AddTextBox({
+    Name = "Amount",
+    PlaceholderText = tostring(ballsAmount),
+    Callback = function(value)
+        local n = tonumber(value)
+        if n and n > 0 then
+            ballsAmount = math.floor(n)
+            print("Quantidade ajustada para:", ballsAmount)
+        else
+            print("Digite um número válido maior que zero")
+        end
+    end
+})
+
+-- Toggle balls lopper
+funtab:AddToggle({
+    Name = "dupe balls",
+    Default = false,
+    Callback = function(state)
+        toggles.LagLaptop = state
+
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local hrp = character:WaitForChild("HumanoidRootPart")
+
+        if state then
+            posAnterior = hrp.CFrame
+
+            local laptopPart = workspace:FindFirstChild("WorkspaceCom")
+                and workspace.WorkspaceCom:FindFirstChild("001_GiveTools")
+                and workspace.WorkspaceCom["001_GiveTools"]:FindFirstChild("Basketball")
+
+            if laptopPart and laptopPart:IsA("BasePart") then
+                spawn(function()
+                    lagarJogoLaptop(laptopPart)
+                end)
+            else
+                warn("ball")
+            end
+        else
+            -- REMOVIDO o teleporte para posição anterior aqui
+            print("balls lopper desativado")
+        end
+    end
+})
+
+
+
+funtab:AddToggle({
+    Name = "balls looper",
+    Default = false,
+    Callback = function(state)
+        toggles.LagLaptop = state
+
+        if state then
+            spawn(function()
+                while toggles.LagLaptop do
+                    local char = game.Players.LocalPlayer.Character
+                    if char then
+                        local tools = {}
+                        for _, tool in ipairs(char:GetChildren()) do
+                            if tool:IsA("Tool") then
+                                table.insert(tools, tool)
+                            end
+                        end
+
+                        for _, tool in ipairs(tools) do
+                            if not toggles.LagLaptop then break end
+                            pcall(function()
+                                tool:Activate()
+                            end)
+                            task.wait(0.02) -- bem rápido entre cada uso
+                        end
+                    end
+                    task.wait(0.02) -- quase instantâneo antes de repetir
+                end
+            end)
+        else
+            print("balls lopper desativado")
+        end
+    end
+})
+
 local funtab = Window:MakeTab({"Fun", "home"})
 
 -- Variável para guardar a posição original
@@ -8304,6 +8633,32 @@ funtab:AddToggle({
         end
     end
 })
+
+local toggles = {}
+
+funtab:AddToggle({
+    Name = "Balls Cleaner",
+    Default = false,
+    Callback = function(state)
+        toggles.LimparBolas = state
+
+        if state then
+            toggles._cleanBallsConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                local ws = game:GetService("Workspace")
+                local com = ws:FindFirstChild("WorkspaceCom")
+                if com and com:FindFirstChild("Handle") then
+                    com.Handle:Destroy()
+                end
+            end)
+        else
+            if toggles._cleanBallsConnection then
+                toggles._cleanBallsConnection:Disconnect()
+                toggles._cleanBallsConnection = nil
+                print("Limpar Bolas desativado")
+            end
+        end
+    end
+}
 
 
 local UniversalTab = Window:MakeTab({"Others 2", "plane"})
