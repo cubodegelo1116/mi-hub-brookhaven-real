@@ -8510,6 +8510,13 @@ funtab:AddToggle({
     end
 })
 
+funtab:AddButton({
+    Name = "R6 FE",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/cubodegelo1116/R6-FE/refs/heads/main/R6"))()
+    end
+})
+
 
 local UniversalTab = Window:MakeTab({"Others 2", "plane"})
 
