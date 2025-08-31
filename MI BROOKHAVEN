@@ -3591,6 +3591,7 @@ local bioConfig = {
 
 -- Lista de cores
 local availableColors = {
+    ["Mi Team"] = Color3.fromRGB(252, 205, 164),
     ["Branco"] = Color3.fromRGB(255, 255, 255),
     ["Vermelho"] = Color3.fromRGB(255, 0, 0),
     ["Verde"] = Color3.fromRGB(0, 255, 0),
